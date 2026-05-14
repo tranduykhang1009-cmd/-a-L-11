@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ôn tập Địa Lí 11 - Pro App</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -25,9 +24,10 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        h1, h2, h3, h4, .app-title { font-family: 'Nunito', sans-serif; }
+        h1, h2, h3, h4, .app-title, .timer-display { font-family: 'Nunito', sans-serif; }
         body, p, button, input { font-family: 'Inter', sans-serif; }
 
+        /* Khóa cuộn trang của body để làm app layout */
         body {
             background: linear-gradient(135deg, #020617 0%, #1e1b4b 50%, #0f172a 100%);
             color: var(--text-main);
@@ -38,14 +38,26 @@
         }
 
         .app-container {
-            width: 100%; max-width: 600px; height: 100%;
-            display: flex; flex-direction: column; padding: 10px; position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            position: relative;
         }
 
         .card {
-            background: var(--bg-card); backdrop-filter: blur(20px); border-radius: var(--radius);
-            border: 1px solid var(--border-glass); flex: 1; display: flex; flex-direction: column;
-            overflow: hidden; animation: fadeIn 0.3s ease; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-glass);
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
@@ -55,131 +67,158 @@
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
         /* ================= HOME SCREEN ================= */
-        #home-screen { padding: 30px 20px; overflow-y: auto; }
+        #home-screen { padding: 30px 20px; overflow-y: auto; display: flex; flex-direction: column; justify-content: center;}
         
-        .app-title-wrapper { text-align: center; margin-bottom: 30px; position: relative; padding-top: 10px; }
-        .logo-icon { font-size: 55px; line-height: 1; filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.6)); margin-bottom: 5px; }
+        .app-title-wrapper {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .logo-icon { 
+            font-size: 60px; 
+            line-height: 1;
+            filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.6));
+            margin-bottom: 10px;
+        }
         .app-title { 
-            font-size: 34px; font-weight: 900; background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase;
-            letter-spacing: 1px; filter: drop-shadow(0px 4px 10px rgba(129, 140, 248, 0.3));
+            font-size: 34px; 
+            font-weight: 900; 
+            background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            filter: drop-shadow(0px 4px 10px rgba(129, 140, 248, 0.3));
         }
         .app-badge {
-            background: linear-gradient(135deg, #ef4444, #f59e0b); color: white; font-size: 13px; font-weight: 900;
-            padding: 4px 12px; border-radius: 20px; position: absolute; top: 25px; right: 15%;
-            transform: rotate(15deg); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.5); border: 2px solid #fff;
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            color: white; font-size: 13px; font-weight: 900;
+            padding: 4px 12px; border-radius: 20px;
+            position: absolute; top: 20px; right: 15%;
+            transform: rotate(15deg); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.5);
+            border: 2px solid #fff;
         }
 
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 15px; color: var(--text-main); }
-        .student-input {
-            width: 100%; padding: 18px; border-radius: 14px; border: 2px solid var(--border-glass);
-            background: rgba(0,0,0,0.3); color: white; font-size: 16px; font-weight: 600; outline: none; transition: 0.3s;
-        }
-        .student-input:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
-
+        /* Thanh gạt Toggle Switch */
         .toggle-wrapper {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); padding: 16px 20px;
-            border-radius: 14px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: 0.2s;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-glass);
+            padding: 16px 20px;
+            border-radius: 14px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: 0.2s;
         }
         .toggle-wrapper:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
         .toggle-label { font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; cursor: pointer; }
         
-        .toggle-switch { position: relative; display: inline-block; width: 54px; height: 30px; }
+        .toggle-switch {
+            position: relative; display: inline-block; width: 54px; height: 30px;
+        }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 34px; border: 1px solid var(--border-glass); }
-        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 50%; }
+        .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1);
+            transition: .4s; border-radius: 34px;
+            border: 1px solid var(--border-glass);
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px;
+            background-color: var(--text-muted); transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 50%;
+        }
         input:checked + .slider { background-color: var(--primary); border-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(24px); background-color: white; box-shadow: 0 0 10px rgba(255,255,255,0.8); }
 
         .lesson-grid { display: flex; flex-direction: column; gap: 12px; }
-        .lesson-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-glass); border-radius: 14px; padding: 15px; font-size: 15px; font-weight: 600; color: var(--text-main); cursor: pointer; display: flex; align-items: center; gap: 15px; text-align: left; }
+        .lesson-btn {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-glass);
+            border-radius: 14px; padding: 15px; font-size: 15px; font-weight: 600;
+            color: var(--text-main); cursor: pointer; display: flex; align-items: center; gap: 15px; text-align: left; transition: 0.2s;
+        }
         .lesson-btn:active { transform: scale(0.98); background: rgba(59, 130, 246, 0.2); border-color: var(--primary); }
         .lesson-btn span.icon { font-size: 22px; width: 40px; height: 40px; background: rgba(0,0,0,0.3); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
         .all-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; justify-content: center; font-size: 16px; color: white; margin-top: 5px; font-family: 'Nunito', sans-serif; font-weight: 800;}
 
-        /* ================= QUIZ SCREEN & MINI ISLAND ================= */
+        /* ================= QUIZ SCREEN ================= */
         .quiz-top {
             padding: 15px 20px; border-bottom: 1px solid var(--border-glass);
             display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);
-            position: relative; /* Quan trọng để căn giữa Island */
         }
-        .btn-small { background: rgba(255,255,255,0.1); border: none; color: white; font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 8px; cursor: pointer; z-index: 10; transition: 0.2s;}
-        .btn-small:active { transform: scale(0.9); }
+        .btn-small { background: rgba(255,255,255,0.1); border: none; color: white; font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: 0.2s;}
+        .btn-small:active { transform: scale(0.95); }
         .btn-submit { background: var(--danger); color: white; }
+        .timer-display { font-size: 18px; font-weight: 900; color: var(--warning); letter-spacing: 1px; }
 
-        /* --- MINI DYNAMIC ISLAND --- */
-        .mini-island-container {
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-            z-index: 100;
-        }
-        .mini-island {
-            background: #000; border-radius: 20px; height: 34px; min-width: 90px;
-            display: flex; justify-content: center; align-items: center; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.08);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative; overflow: hidden;
-        }
-        .mini-island:active { transform: scale(0.92); }
-        .mini-island.expanded { height: 60px; min-width: 220px; border-radius: 25px; cursor: default; }
-
-        .island-content-compact {
-            display: flex; align-items: center; gap: 6px; position: absolute;
-            font-size: 15px; font-weight: 800; font-family: 'Nunito', sans-serif; color: var(--warning);
-            transition: opacity 0.2s;
-        }
-        .mini-island.expanded .island-content-compact { opacity: 0; pointer-events: none; }
-        
-        .island-content-expanded {
-            display: flex; justify-content: space-around; width: 100%; padding: 0 15px;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s 0.1s; align-items: center;
-        }
-        .mini-island.expanded .island-content-expanded { opacity: 1; pointer-events: auto; }
-        .isl-info { display: flex; flex-direction: column; align-items: center; font-family: 'Nunito'; line-height: 1.2; }
-
-        /* Content Quiz */
         .progress-bar-wrap { height: 4px; background: rgba(0,0,0,0.5); width: 100%; }
         .progress-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
+
         .scrollable-content { flex: 1; overflow-y: auto; padding: 20px; }
 
         .q-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .q-number { font-size: 14px; font-weight: 700; color: var(--primary); background: rgba(59, 130, 246, 0.15); padding: 4px 10px; border-radius: 6px; }
-        .flag-btn { background: transparent; border: 1px solid var(--border-glass); color: var(--text-muted); padding: 5px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; display: flex; gap: 5px; cursor: pointer; transition: 0.2s;}
-        .flag-btn:active { transform: scale(0.9); }
+        .flag-btn { background: transparent; border: 1px solid var(--border-glass); color: var(--text-muted); padding: 5px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; display: flex; gap: 5px; cursor: pointer;}
         .flag-btn.active { color: var(--warning); border-color: var(--warning); background: rgba(250, 204, 21, 0.1); }
 
         .question-text { font-size: 18px; font-weight: 800; line-height: 1.5; margin-bottom: 20px; }
 
         .options-list { display: flex; flex-direction: column; gap: 12px; }
-        .option-btn { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 12px; padding: 16px; font-size: 15px; text-align: left; color: white; font-weight: 500; line-height: 1.4; transition: 0.2s; }
+        .option-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 12px;
+            padding: 16px; font-size: 15px; text-align: left; color: white; font-weight: 500; line-height: 1.4; transition: 0.2s; cursor: pointer;
+        }
         .option-btn:active:not(:disabled) { background: rgba(255,255,255,0.1); transform: scale(0.98);}
         .option-btn:disabled { cursor: default; }
         .option-btn.correct { background: var(--success-bg); border-color: var(--success); font-weight: 700; }
         .option-btn.wrong { background: var(--danger-bg); border-color: var(--danger); opacity: 0.8; }
         .option-btn.show-correct { border: 2px dashed var(--success); color: var(--success); font-weight: 700; }
 
-        .explanation-box { margin-top: 20px; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); border-left: 4px solid var(--warning); display: none; animation: slideDown 0.3s; }
+        .explanation-box {
+            margin-top: 20px; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3);
+            border-left: 4px solid var(--warning); display: none; animation: slideDown 0.3s;
+        }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .explanation-box.show { display: block; }
         .explanation-box h4 { color: var(--warning); font-size: 14px; margin-bottom: 5px; }
         .explanation-box p { font-size: 14px; line-height: 1.5; color: var(--text-muted); }
 
-        .quiz-bottom { padding: 15px 20px; border-top: 1px solid var(--border-glass); background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .nav-btn { flex: 1; background: rgba(255,255,255,0.1); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s;}
+        .quiz-bottom {
+            padding: 15px 20px; border-top: 1px solid var(--border-glass); background: rgba(0,0,0,0.4);
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+        }
+        .nav-btn {
+            flex: 1; background: rgba(255,255,255,0.1); color: white; border: none;
+            padding: 14px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s;
+        }
         .nav-btn:active:not(:disabled) { transform: scale(0.95); }
         .nav-btn:disabled { opacity: 0.3; }
         .nav-btn.next { background: var(--primary); }
-        .btn-list { flex: 0.5; background: transparent; border: 1px solid var(--border-glass); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; font-size: 11px; border-radius: 12px; color: var(--text-muted); font-weight: 700; cursor: pointer; transition: 0.2s;}
-        .btn-list:active { transform: scale(0.95); background: rgba(255,255,255,0.05);}
+        .btn-list { flex: 0.5; background: transparent; border: 1px solid var(--border-glass); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; font-size: 11px; border-radius: 12px; color: var(--text-muted); font-weight: 700; cursor: pointer;}
+        .btn-list:active { background: rgba(255,255,255,0.05); }
 
         /* ================= PALETTE MODAL ================= */
-        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 100; display: none; flex-direction: column; justify-content: flex-end; }
-        .modal-content { background: #1e293b; border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 20px; max-height: 70%; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 100;
+            display: none; flex-direction: column; justify-content: flex-end;
+        }
+        .modal-content {
+            background: #1e293b; border-top-left-radius: 24px; border-top-right-radius: 24px;
+            padding: 20px; max-height: 70%; display: flex; flex-direction: column;
+            animation: slideUp 0.3s ease-out;
+        }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .close-modal { background: rgba(255,255,255,0.1); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; cursor: pointer; }
+        .close-modal { background: rgba(255,255,255,0.1); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; cursor: pointer;}
         .palette-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 8px; overflow-y: auto; padding-bottom: 20px;}
-        .pal-btn { aspect-ratio: 1; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; font-weight: 700; font-size: 13px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .pal-btn {
+            aspect-ratio: 1; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05); color: white; font-weight: 700; font-size: 13px;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+        }
         .pal-btn.current { border: 2px solid white; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
         .pal-btn.correct { background: var(--success); border-color: var(--success); }
         .pal-btn.wrong { background: var(--danger); border-color: var(--danger); }
@@ -187,21 +226,31 @@
 
         /* ================= RESULT SCREEN ================= */
         #result-screen { padding: 30px 20px; overflow-y: auto; text-align: center; }
-        .score-circle { width: 140px; height: 140px; border-radius: 50%; border: 8px solid var(--primary); display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0 auto 20px; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); background: rgba(0,0,0,0.3); }
+        .score-circle {
+            width: 140px; height: 140px; border-radius: 50%; border: 8px solid var(--primary);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0 auto 20px;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); background: rgba(0,0,0,0.3);
+        }
         .score-circle h2 { font-size: 36px; line-height: 1; color: var(--warning); }
         .score-circle span { font-size: 13px; color: var(--text-muted); font-weight: 700;}
         .eval-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--border-glass); font-size: 14px; line-height: 1.5;}
         
         .action-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-        .btn-retry-wrong { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid var(--danger); padding: 14px; border-radius: 12px; font-weight: 700; display: none; cursor: pointer; transition: 0.2s;}
+        .btn-retry-wrong { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid var(--danger); padding: 14px; border-radius: 12px; font-weight: 700; display: none; cursor: pointer;}
         .btn-retry-wrong:active { background: var(--danger); color: white; }
 
         .review-list { text-align: left; display: flex; flex-direction: column; gap: 12px; }
         .review-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border-left: 4px solid var(--danger); }
         .review-item.flag-only { border-left-color: var(--warning); }
-        .r-q { font-weight: 700; font-size: 14px; margin-bottom: 8px; line-height: 1.4;}
+        .r-q { font-weight: 700; font-size: 14px; margin-bottom: 8px; line-height: 1.4; color: white;}
         .r-a { color: var(--success); font-size: 13px; font-weight: 600; margin-bottom: 5px; }
-        .r-e { font-size: 13px; color: var(--text-muted); font-style: italic; }
+        .r-e { font-size: 13px; color: var(--text-muted); font-style: italic; line-height: 1.5;}
+
+        @media (max-width: 600px) {
+            .app-title-wrapper { margin-bottom: 20px; }
+            .app-badge { right: 5%; }
+            .toggle-wrapper { padding: 14px 15px; }
+        }
     </style>
 </head>
 <body>
@@ -215,12 +264,7 @@
                 <div class="app-badge">PRO</div>
             </div>
             
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px;">Hệ thống luyện thi trắc nghiệm siêu tốc</p>
-            
-            <div class="input-group">
-                <label>👤 Tên hiển thị trên bảng vàng (Tùy chọn):</label>
-                <input type="text" id="student-name" class="student-input" placeholder="VD: Khang 11A8">
-            </div>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 15px;">Hệ thống luyện thi trắc nghiệm - Bản Không Nhập Tên</p>
 
             <label class="toggle-wrapper" for="shuffle-toggle">
                 <span class="toggle-label">🔀 Trộn ngẫu nhiên câu hỏi</span>
@@ -242,26 +286,7 @@
         <div id="quiz-screen" class="card" style="display: none;">
             <div class="quiz-top">
                 <button class="btn-small" onclick="forceQuit()">Thoát</button>
-                
-                <div class="mini-island-container">
-                    <div class="mini-island" id="mini-island" onclick="toggleMiniIsland(event)">
-                        <div class="island-content-compact" id="island-compact">
-                            <i class="fa-solid fa-hourglass-half"></i>
-                            <span id="timer-display">00:00</span>
-                        </div>
-                        <div class="island-content-expanded" id="island-expanded">
-                            <div class="isl-info">
-                                <span style="color: var(--text-muted); font-size: 11px;">Đã làm</span>
-                                <span id="island-prog" style="color: var(--primary); font-weight: 900; font-size: 16px;">0/71</span>
-                            </div>
-                            <div class="isl-info">
-                                <span style="color: var(--text-muted); font-size: 11px;">Thời gian</span>
-                                <span id="island-time-exp" style="color: var(--warning); font-weight: 900; font-size: 16px;">00:00</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                <div class="timer-display" id="timer-display">00:00</div>
                 <button class="btn-small btn-submit" onclick="confirmSubmit()">Nộp bài</button>
             </div>
             
@@ -295,7 +320,7 @@
         <div id="palette-modal" class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 style="font-size: 16px;">Bảng câu hỏi</h3>
+                    <h3 style="font-size: 16px; color: white;">Bảng câu hỏi</h3>
                     <button class="close-modal" onclick="togglePalette()">✕</button>
                 </div>
                 <div class="palette-grid" id="palette-grid"></div>
@@ -304,7 +329,7 @@
 
         <div id="result-screen" class="card" style="display: none;">
             <div class="logo-icon" style="font-size: 40px; padding: 10px; text-align:center; margin: 0 auto 10px; filter:none;">🏆</div>
-            <h2 style="font-size: 20px; margin-bottom: 5px; color: var(--primary);" id="res-student-name">Tên học sinh</h2>
+            <h2 style="font-size: 20px; margin-bottom: 5px; color: var(--primary);">Kết quả bài thi</h2>
             <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Thời gian làm bài: <span id="res-time" style="color: white; font-weight: bold;">00:00</span></p>
 
             <div class="score-circle">
@@ -327,7 +352,7 @@
     </div>
 
     <script>
-        // ================= DỮ LIỆU ĐỊA LÍ (FULL 71 CÂU TỪ FILE) =================
+        // ================= DỮ LIỆU ĐỊA LÍ CHUẨN XÁC 100% (71 CÂU) =================
         const masterQuizData = [
             // --- NHẬT BẢN ---
             { lesson: "Nhật Bản", question: "Câu 1: Quần đảo Nhật Bản nằm ở", options: ["A. Đại Tây Dương.", "B. Thái Bình Dương.", "C. Ấn Độ Dương.", "D. Nam Đại Dương."], correctIndex: 1, explanation: "Nhật Bản là quốc gia quần đảo nằm ở rìa phía Đông của lục địa châu Á, bao quanh bởi Thái Bình Dương." },
@@ -354,7 +379,7 @@
             { lesson: "Nhật Bản", question: "Câu 22: Ngành công nghiệp mũi nhọn hiện nay của Nhật Bản là", options: ["A. chế tạo.", "B. điện tử.", "C. xây dựng.", "D. dệt."], correctIndex: 1, explanation: "Công nghiệp điện tử, tin học và chế tạo vi mạch, robot là những ngành mũi nhọn mang lại lợi nhuận cao nhất." },
             { lesson: "Nhật Bản", question: "Câu 23: Loại hình giao thông vận tải có ý nghĩa quan trọng nhất với ngành ngoại thương của Nhật Bản là", options: ["A. đường biển.", "B. đường ô tô.", "C. đường hàng không.", "D. đường sắt."], correctIndex: 0, explanation: "Là một quốc đảo, đường biển đóng vai trò số 1 trong việc nhập khẩu nguyên liệu và xuất khẩu hàng hóa." },
             { lesson: "Nhật Bản", question: "Câu 24: Công nghiệp gỗ, giấy tập trung chủ yếu ở đảo Hô-cai-đô do nguyên nhân chủ yếu nào sau đây?", options: ["A. Nguồn nguyên liệu phong phú.", "B. Vị trí địa lí nhiều thuận lợi.", "C. Nguồn lao động rất dồi dào.", "D. Cơ sở hạ tầng phát triển mạnh."], correctIndex: 0, explanation: "Đảo Hô-cai-đô có diện tích rừng lá kim bao phủ rất lớn, cung cấp nguồn gỗ dồi dào cho công nghiệp giấy." },
-            { lesson: "Nhật Bản", question: "Câu 25: Nông nghiệp đóng vai trò chính trong hoạt kinh tế là đặc điểm của vùng", options: ["A. Hôn-su.", "B. Kiu-xiu.", "C. Xi-cô-cư.", "D. Hô-cai-đô."], correctIndex: 3, explanation: "So với các đảo khác tập trung mạnh vào công nghiệp, Hô-cai-đô là vùng mà nông - lâm - ngư nghiệp vẫn đóng vai trò chính." },
+            { lesson: "Nhật Bản", question: "Câu 25: Nông nghiệp đóng vai trò chính trong hoạt động kinh tế là đặc điểm của vùng", options: ["A. Hôn-su.", "B. Kiu-xiu.", "C. Xi-cô-cư.", "D. Hô-cai-đô."], correctIndex: 3, explanation: "So với các đảo khác tập trung mạnh vào công nghiệp, Hô-cai-đô là vùng mà nông - lâm - ngư nghiệp vẫn đóng vai trò chính." },
             { lesson: "Nhật Bản", question: "Câu 26: Hình thức chăn nuôi chủ yếu ở Nhật Bản là", options: ["A. hộ gia đình.", "B. du mục.", "C. quảng canh.", "D. trang trại."], correctIndex: 3, explanation: "Nhật Bản áp dụng công nghệ cao vào chăn nuôi nên hình thức trang trại hiện đại chiếm ưu thế." },
             { lesson: "Nhật Bản", question: "Câu 27: Thị trường khách du lịch quốc tế đến Nhật Bản chủ yếu từ các nước thuộc", options: ["A. châu Âu.", "B. châu Á.", "C. châu Mỹ.", "D. châu Đại Dương."], correctIndex: 1, explanation: "Do khoảng cách địa lí và giao thoa văn hóa, khách du lịch từ các nước châu Á (Hàn Quốc, Trung Quốc, Việt Nam...) chiếm tỉ lệ cao nhất." },
             { lesson: "Nhật Bản", question: "Câu 28: Đặc điểm nào sau đây KHÔNG đúng với vùng kinh tế Hôn-su?", options: ["A. Phát triển mạnh khai thác than và luyện thép.", "B. Diện tích lớn nhất, dân số tập trung đông nhất.", "C. Kinh tế phát triển nhất trong tất cả các vùng.", "D. Ô-xa-ca và Cô-bê là những thành phố lớn."], correctIndex: 0, explanation: "Hôn-su là vùng trung tâm phát triển công nghiệp chế tạo, điện tử. Khai thác than và luyện thép là đặc điểm nổi bật của vùng Kiu-xiu." },
@@ -386,7 +411,7 @@
             { lesson: "Trung Quốc", question: "Câu 21: Cây trồng giữ vị trí quan trọng nhất trong ngành trồng trọt ở Trung Quốc là", options: ["A. cây lương thực.", "B. cây ăn quả.", "C. cây công nghiệp.", "D. cây thực phẩm."], correctIndex: 0, explanation: "Với quy mô dân số hơn 1,4 tỉ người, việc đảm bảo an ninh lương thực là ưu tiên số 1, do đó cây lương thực luôn giữ vị trí chủ đạo." },
             { lesson: "Trung Quốc", question: "Câu 22: Loại vật nuôi nhiều nhất ở miền Tây Trung Quốc là", options: ["A. cừu.", "B. bò.", "C. ngựa.", "D. lợn."], correctIndex: 0, explanation: "Miền Tây có các đồng cỏ khô hạn trên cao nguyên, phù hợp nhất với việc chăn thả cừu." },
             { lesson: "Trung Quốc", question: "Câu 23: Trung Quốc đang đứng đầu thế giới về chiều dài", options: ["A. đường ô tô cao tốc.", "B. đường sắt đệm từ.", "C. đường thủy nội địa.", "D. đường biển."], correctIndex: 0, explanation: "Sự phát triển thần tốc của hạ tầng đã giúp Trung Quốc vươn lên đứng đầu thế giới về tổng chiều dài đường ô tô cao tốc." },
-            { lesson: "Trung Quốc", question: "Câu 24: Những thay đổi quan trọng trong nền kinh tế Trung Quốc là kết quả của", options: ["A. công cuộc đại nhảy vọt.", "B. các kế hoạch 5 năm.", "C. công cuộc cải cách, hiện đại hóa.", "D. cuộc cách mạng văn hóa."], correctIndex: 2, explanation: "Công cuộc cải cách mở cửa và hiện đại hóa đất nước từ năm 1978 đã làm thay đổi hoàn toàn bộ mặt kinh tế Trung Quốc." },
+            { lesson: "Trung Quốc", question: "Câu 24: Những thay đổi quan trọng trong nền kinh tế Trung Quốc là kết quả của", options: ["A. công cuộc đại nhảy vọt.", "B. các kế hoạch 5 năm.", "C. công cuộc hiện đại hóa.", "D. cuộc cách mạng văn hóa."], correctIndex: 2, explanation: "Công cuộc cải cách mở cửa và hiện đại hóa đất nước từ năm 1978 đã làm thay đổi hoàn toàn bộ mặt kinh tế Trung Quốc." },
             { lesson: "Trung Quốc", question: "Câu 25: Ngành công nghiệp nào sau đây của Trung Quốc có sản lượng đứng đầu thế giới?", options: ["A. Khai thác than.", "B. Hóa dầu.", "C. Luyện kim.", "D. Thực phẩm."], correctIndex: 0, explanation: "Trung Quốc là quốc gia khai thác và tiêu thụ than đá lớn nhất thế giới." },
             { lesson: "Trung Quốc", question: "Câu 26: Hiện nay quy mô GDP của Trung Quốc đứng thứ mấy trên thế giới?", options: ["A. Thứ nhất.", "B. Thứ hai.", "C. Thứ ba.", "D. Thứ tư."], correctIndex: 1, explanation: "Tính đến hiện tại, quy mô kinh tế của Trung Quốc đứng thứ 2 thế giới, chỉ xếp sau Hoa Kỳ." },
             { lesson: "Trung Quốc", question: "Câu 27: Trong khoảng hai thập niên cuối thế kỷ XX, Trung Quốc đứng đầu thế giới về", options: ["A. tổng sản phẩm quốc nội.", "B. GDP bình quân đầu người.", "C. tốc độ tăng trưởng kinh tế.", "D. đầu tư nước ngoài (FDI)."], correctIndex: 2, explanation: "Suốt những năm 1980-2000, Trung Quốc duy trì tốc độ tăng trưởng kinh tế (GDP) ở mức hai con số, cao nhất thế giới." },
@@ -414,9 +439,7 @@
         
         let timerInterval;
         let timeElapsed = 0;
-        let miniIslandTimeout;
 
-        // DOM Elements
         const homeScreen = document.getElementById('home-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultScreen = document.getElementById('result-screen');
@@ -434,30 +457,10 @@
         const btnNext = document.getElementById('btn-next');
         const flagBtn = document.getElementById('flag-btn');
 
-        function showFunnyToast() {
-            const toast = document.getElementById('funny-toast');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 4000);
-        }
-
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-
-        // ================= MINI DYNAMIC ISLAND =================
-        function toggleMiniIsland(e) {
-            if(e) e.stopPropagation();
-            const isl = document.getElementById('mini-island');
-            isl.classList.toggle('expanded');
-            
-            clearTimeout(miniIslandTimeout);
-            if(isl.classList.contains('expanded')) {
-                miniIslandTimeout = setTimeout(() => {
-                    isl.classList.remove('expanded');
-                }, 3000);
             }
         }
 
@@ -475,7 +478,6 @@
             let m = Math.floor(timeElapsed / 60).toString().padStart(2, '0');
             let s = (timeElapsed % 60).toString().padStart(2, '0');
             document.getElementById('timer-display').innerText = `${m}:${s}`;
-            document.getElementById('island-time-exp').innerText = `${m}:${s}`;
         }
 
         function formatTime(seconds) {
@@ -512,7 +514,6 @@
 
         function updatePaletteUI() {
             const btns = document.getElementById('palette-grid').children;
-            if(!btns.length) return;
             for(let i=0; i<btns.length; i++) {
                 btns[i].className = 'pal-btn'; 
                 if (i === currentQuestionIndex) btns[i].classList.add('current');
@@ -527,9 +528,6 @@
         }
 
         function startQuiz(mode) {
-            studentName = document.getElementById('student-name').value.trim();
-            if(!studentName) studentName = "Thí sinh";
-
             if (mode === 'retry') {
                 let wrongItems = [];
                 answersState.forEach((ans, idx) => {
@@ -564,7 +562,6 @@
         }
 
         function confirmSubmit() {
-            document.getElementById('mini-island').classList.remove('expanded');
             let remain = answersState.filter(a => a === -1).length;
             let msg = remain > 0 ? `Cảnh báo: Bạn còn ${remain} câu chưa làm!\nBạn có chắc muốn nộp bài?` : `Tuyệt vời! Bạn đã làm xong.\nTiến hành nộp bài?`;
             if(confirm(msg)) showResults();
@@ -596,8 +593,6 @@
             
             let done = answersState.filter(a => a !== -1).length;
             progressBar.style.width = (done / activeQuizData.length * 100) + '%';
-            
-            document.getElementById('island-prog').innerText = `${done}/${activeQuizData.length}`;
 
             btnPrev.disabled = currentQuestionIndex === 0;
             btnNext.disabled = currentQuestionIndex === activeQuizData.length - 1;
@@ -658,7 +653,6 @@
                 else wrongIndexes.push(i);
             });
 
-            document.getElementById('res-student-name').innerText = studentName;
             document.getElementById('res-time').innerText = formatTime(timeElapsed);
             document.getElementById('score-text').innerText = `${scoreCount}/${activeQuizData.length}`;
             
