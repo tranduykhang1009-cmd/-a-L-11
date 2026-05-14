@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ôn tập Địa Lí 11 - Pro App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-body: #020617;
+            --bg-card: rgba(15, 23, 42, 0.85);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --warning: #facc15;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --radius: 20px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        h1, h2, h3, h4, .app-title { font-family: 'Nunito', sans-serif; }
+        body, p, button, input { font-family: 'Inter', sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #020617 0%, #1e1b4b 50%, #0f172a 100%);
+            color: var(--text-main);
+            height: 100dvh; 
+            overflow: hidden; 
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%; max-width: 600px; height: 100%;
+            display: flex; flex-direction: column; padding: 10px; position: relative;
+        }
+
+        .card {
+            background: var(--bg-card); backdrop-filter: blur(20px); border-radius: var(--radius);
+            border: 1px solid var(--border-glass); flex: 1; display: flex; flex-direction: column;
+            overflow: hidden; animation: fadeIn 0.3s ease; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        /* ================= HOME SCREEN ================= */
+        #home-screen { padding: 30px 20px; overflow-y: auto; }
+        
+        .app-title-wrapper { text-align: center; margin-bottom: 30px; position: relative; padding-top: 10px; }
+        .logo-icon { font-size: 55px; line-height: 1; filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.6)); margin-bottom: 5px; }
+        .app-title { 
+            font-size: 34px; font-weight: 900; background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase;
+            letter-spacing: 1px; filter: drop-shadow(0px 4px 10px rgba(129, 140, 248, 0.3));
+        }
+        .app-badge {
+            background: linear-gradient(135deg, #ef4444, #f59e0b); color: white; font-size: 13px; font-weight: 900;
+            padding: 4px 12px; border-radius: 20px; position: absolute; top: 25px; right: 15%;
+            transform: rotate(15deg); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.5); border: 2px solid #fff;
+        }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 15px; color: var(--text-main); }
+        .student-input {
+            width: 100%; padding: 18px; border-radius: 14px; border: 2px solid var(--border-glass);
+            background: rgba(0,0,0,0.3); color: white; font-size: 16px; font-weight: 600; outline: none; transition: 0.3s;
+        }
+        .student-input:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+
+        .toggle-wrapper {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); padding: 16px 20px;
+            border-radius: 14px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: 0.2s;
+        }
+        .toggle-wrapper:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
+        .toggle-label { font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        
+        .toggle-switch { position: relative; display: inline-block; width: 54px; height: 30px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 34px; border: 1px solid var(--border-glass); }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); border-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(24px); background-color: white; box-shadow: 0 0 10px rgba(255,255,255,0.8); }
+
+        .lesson-grid { display: flex; flex-direction: column; gap: 12px; }
+        .lesson-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-glass); border-radius: 14px; padding: 15px; font-size: 15px; font-weight: 600; color: var(--text-main); cursor: pointer; display: flex; align-items: center; gap: 15px; text-align: left; }
+        .lesson-btn:active { transform: scale(0.98); background: rgba(59, 130, 246, 0.2); border-color: var(--primary); }
+        .lesson-btn span.icon { font-size: 22px; width: 40px; height: 40px; background: rgba(0,0,0,0.3); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .all-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; justify-content: center; font-size: 16px; color: white; margin-top: 5px; font-family: 'Nunito', sans-serif; font-weight: 800;}
+
+        /* ================= QUIZ SCREEN & MINI ISLAND ================= */
+        .quiz-top {
+            padding: 15px 20px; border-bottom: 1px solid var(--border-glass);
+            display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);
+            position: relative; /* Quan trọng để căn giữa Island */
+        }
+        .btn-small { background: rgba(255,255,255,0.1); border: none; color: white; font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 8px; cursor: pointer; z-index: 10; transition: 0.2s;}
+        .btn-small:active { transform: scale(0.9); }
+        .btn-submit { background: var(--danger); color: white; }
+
+        /* --- MINI DYNAMIC ISLAND --- */
+        .mini-island-container {
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            z-index: 100;
+        }
+        .mini-island {
+            background: #000; border-radius: 20px; height: 34px; min-width: 90px;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.08);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative; overflow: hidden;
+        }
+        .mini-island:active { transform: scale(0.92); }
+        .mini-island.expanded { height: 60px; min-width: 220px; border-radius: 25px; cursor: default; }
+
+        .island-content-compact {
+            display: flex; align-items: center; gap: 6px; position: absolute;
+            font-size: 15px; font-weight: 800; font-family: 'Nunito', sans-serif; color: var(--warning);
+            transition: opacity 0.2s;
+        }
+        .mini-island.expanded .island-content-compact { opacity: 0; pointer-events: none; }
+        
+        .island-content-expanded {
+            display: flex; justify-content: space-around; width: 100%; padding: 0 15px;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s 0.1s; align-items: center;
+        }
+        .mini-island.expanded .island-content-expanded { opacity: 1; pointer-events: auto; }
+        .isl-info { display: flex; flex-direction: column; align-items: center; font-family: 'Nunito'; line-height: 1.2; }
+
+        /* Content Quiz */
+        .progress-bar-wrap { height: 4px; background: rgba(0,0,0,0.5); width: 100%; }
+        .progress-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
+        .scrollable-content { flex: 1; overflow-y: auto; padding: 20px; }
+
+        .q-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .q-number { font-size: 14px; font-weight: 700; color: var(--primary); background: rgba(59, 130, 246, 0.15); padding: 4px 10px; border-radius: 6px; }
+        .flag-btn { background: transparent; border: 1px solid var(--border-glass); color: var(--text-muted); padding: 5px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; display: flex; gap: 5px; cursor: pointer; transition: 0.2s;}
+        .flag-btn:active { transform: scale(0.9); }
+        .flag-btn.active { color: var(--warning); border-color: var(--warning); background: rgba(250, 204, 21, 0.1); }
+
+        .question-text { font-size: 18px; font-weight: 800; line-height: 1.5; margin-bottom: 20px; }
+
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 12px; padding: 16px; font-size: 15px; text-align: left; color: white; font-weight: 500; line-height: 1.4; transition: 0.2s; }
+        .option-btn:active:not(:disabled) { background: rgba(255,255,255,0.1); transform: scale(0.98);}
+        .option-btn:disabled { cursor: default; }
+        .option-btn.correct { background: var(--success-bg); border-color: var(--success); font-weight: 700; }
+        .option-btn.wrong { background: var(--danger-bg); border-color: var(--danger); opacity: 0.8; }
+        .option-btn.show-correct { border: 2px dashed var(--success); color: var(--success); font-weight: 700; }
+
+        .explanation-box { margin-top: 20px; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); border-left: 4px solid var(--warning); display: none; animation: slideDown 0.3s; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .explanation-box.show { display: block; }
+        .explanation-box h4 { color: var(--warning); font-size: 14px; margin-bottom: 5px; }
+        .explanation-box p { font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+
+        .quiz-bottom { padding: 15px 20px; border-top: 1px solid var(--border-glass); background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .nav-btn { flex: 1; background: rgba(255,255,255,0.1); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s;}
+        .nav-btn:active:not(:disabled) { transform: scale(0.95); }
+        .nav-btn:disabled { opacity: 0.3; }
+        .nav-btn.next { background: var(--primary); }
+        .btn-list { flex: 0.5; background: transparent; border: 1px solid var(--border-glass); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; font-size: 11px; border-radius: 12px; color: var(--text-muted); font-weight: 700; cursor: pointer; transition: 0.2s;}
+        .btn-list:active { transform: scale(0.95); background: rgba(255,255,255,0.05);}
+
+        /* ================= PALETTE MODAL ================= */
+        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 100; display: none; flex-direction: column; justify-content: flex-end; }
+        .modal-content { background: #1e293b; border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 20px; max-height: 70%; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .close-modal { background: rgba(255,255,255,0.1); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; cursor: pointer; }
+        .palette-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 8px; overflow-y: auto; padding-bottom: 20px;}
+        .pal-btn { aspect-ratio: 1; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; font-weight: 700; font-size: 13px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .pal-btn.current { border: 2px solid white; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .pal-btn.correct { background: var(--success); border-color: var(--success); }
+        .pal-btn.wrong { background: var(--danger); border-color: var(--danger); }
+        .pal-btn.flagged { background: var(--warning); color: black; border-color: var(--warning); }
+
+        /* ================= RESULT SCREEN ================= */
+        #result-screen { padding: 30px 20px; overflow-y: auto; text-align: center; }
+        .score-circle { width: 140px; height: 140px; border-radius: 50%; border: 8px solid var(--primary); display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0 auto 20px; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); background: rgba(0,0,0,0.3); }
+        .score-circle h2 { font-size: 36px; line-height: 1; color: var(--warning); }
+        .score-circle span { font-size: 13px; color: var(--text-muted); font-weight: 700;}
+        .eval-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--border-glass); font-size: 14px; line-height: 1.5;}
+        
+        .action-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
+        .btn-retry-wrong { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid var(--danger); padding: 14px; border-radius: 12px; font-weight: 700; display: none; cursor: pointer; transition: 0.2s;}
+        .btn-retry-wrong:active { background: var(--danger); color: white; }
+
+        .review-list { text-align: left; display: flex; flex-direction: column; gap: 12px; }
+        .review-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border-left: 4px solid var(--danger); }
+        .review-item.flag-only { border-left-color: var(--warning); }
+        .r-q { font-weight: 700; font-size: 14px; margin-bottom: 8px; line-height: 1.4;}
+        .r-a { color: var(--success); font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+        .r-e { font-size: 13px; color: var(--text-muted); font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <div id="home-screen" class="card">
+            <div class="app-title-wrapper">
+                <div class="logo-icon">🌍</div>
+                <h1 class="app-title">Địa Lí 11</h1>
+                <div class="app-badge">PRO</div>
+            </div>
+            
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px;">Hệ thống luyện thi trắc nghiệm siêu tốc</p>
+            
+            <div class="input-group">
+                <label>👤 Tên hiển thị trên bảng vàng (Tùy chọn):</label>
+                <input type="text" id="student-name" class="student-input" placeholder="VD: Khang 11A8">
+            </div>
+
+            <label class="toggle-wrapper" for="shuffle-toggle">
+                <span class="toggle-label">🔀 Trộn ngẫu nhiên câu hỏi</span>
+                <div class="toggle-switch">
+                    <input type="checkbox" id="shuffle-toggle" checked>
+                    <span class="slider"></span>
+                </div>
+            </label>
+
+            <div class="lesson-grid">
+                <button class="lesson-btn" onclick="startQuiz('Nhật Bản')"><span class="icon">🗻</span> Địa Lí Nhật Bản (31 Câu)</button>
+                <button class="lesson-btn" onclick="startQuiz('Trung Quốc')"><span class="icon">🐼</span> Địa Lí Trung Quốc (40 Câu)</button>
+                <button class="lesson-btn all-btn" onclick="startQuiz('all')">🚀 CHIẾN TOÀN BỘ ĐỀ (71 CÂU)</button>
+            </div>
+            
+            <div style="text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 30px; font-weight: 600;">by Trần Duy Khang 11A8</div>
+        </div>
+
+        <div id="quiz-screen" class="card" style="display: none;">
+            <div class="quiz-top">
+                <button class="btn-small" onclick="forceQuit()">Thoát</button>
+                
+                <div class="mini-island-container">
+                    <div class="mini-island" id="mini-island" onclick="toggleMiniIsland(event)">
+                        <div class="island-content-compact" id="island-compact">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                            <span id="timer-display">00:00</span>
+                        </div>
+                        <div class="island-content-expanded" id="island-expanded">
+                            <div class="isl-info">
+                                <span style="color: var(--text-muted); font-size: 11px;">Đã làm</span>
+                                <span id="island-prog" style="color: var(--primary); font-weight: 900; font-size: 16px;">0/71</span>
+                            </div>
+                            <div class="isl-info">
+                                <span style="color: var(--text-muted); font-size: 11px;">Thời gian</span>
+                                <span id="island-time-exp" style="color: var(--warning); font-weight: 900; font-size: 16px;">00:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-small btn-submit" onclick="confirmSubmit()">Nộp bài</button>
+            </div>
+            
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar"></div></div>
+            
+            <div class="scrollable-content" id="scroll-content">
+                <div class="q-meta">
+                    <div class="q-number">Câu <span id="current-q">1</span>/<span id="total-q">71</span></div>
+                    <button class="flag-btn" id="flag-btn" onclick="toggleFlag()">🚩 Đánh dấu</button>
+                </div>
+
+                <h2 class="question-text" id="question-text">Đang tải câu hỏi...</h2>
+                <div class="options-list" id="options-container"></div>
+
+                <div class="explanation-box" id="explanation-box">
+                    <h4>💡 Giải thích siêu tốc</h4>
+                    <p id="explanation-text"></p>
+                </div>
+            </div>
+
+            <div class="quiz-bottom">
+                <button class="nav-btn" id="btn-prev" onclick="changeQuestion(-1)">❮ Trước</button>
+                <button class="btn-list" onclick="togglePalette()">
+                    <span style="font-size: 20px;">📋</span>
+                    <span>Danh sách</span>
+                </button>
+                <button class="nav-btn next" id="btn-next" onclick="changeQuestion(1)">Tiếp ❯</button>
+            </div>
+        </div>
+
+        <div id="palette-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 style="font-size: 16px;">Bảng câu hỏi</h3>
+                    <button class="close-modal" onclick="togglePalette()">✕</button>
+                </div>
+                <div class="palette-grid" id="palette-grid"></div>
+            </div>
+        </div>
+
+        <div id="result-screen" class="card" style="display: none;">
+            <div class="logo-icon" style="font-size: 40px; padding: 10px; text-align:center; margin: 0 auto 10px; filter:none;">🏆</div>
+            <h2 style="font-size: 20px; margin-bottom: 5px; color: var(--primary);" id="res-student-name">Tên học sinh</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Thời gian làm bài: <span id="res-time" style="color: white; font-weight: bold;">00:00</span></p>
+
+            <div class="score-circle">
+                <h2 id="score-text">0/0</h2>
+                <span id="accuracy-text">Chính xác: 0%</span>
+            </div>
+
+            <div class="eval-box" id="eval-text">Đang phân tích kết quả...</div>
+
+            <div class="action-row">
+                <button class="lesson-btn all-btn" style="margin-top: 0;" onclick="location.reload()">Về trang chủ thi lại</button>
+                <button class="btn-retry-wrong" id="btn-retry-wrong" onclick="startQuiz('retry')">🔥 Phục thù: Chỉ làm lại câu sai</button>
+            </div>
+
+            <div id="review-section" style="display: none;">
+                <h3 style="font-size: 15px; color: var(--warning); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; text-align: left;">📌 Xem lại (Câu sai & Đánh dấu)</h3>
+                <div class="review-list" id="review-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================= DỮ LIỆU ĐỊA LÍ (FULL 71 CÂU TỪ FILE) =================
+        const masterQuizData = [
+            // --- NHẬT BẢN ---
+            { lesson: "Nhật Bản", question: "Câu 1: Quần đảo Nhật Bản nằm ở", options: ["A. Đại Tây Dương.", "B. Thái Bình Dương.", "C. Ấn Độ Dương.", "D. Nam Đại Dương."], correctIndex: 1, explanation: "Nhật Bản là quốc gia quần đảo nằm ở rìa phía Đông của lục địa châu Á, bao quanh bởi Thái Bình Dương." },
+            { lesson: "Nhật Bản", question: "Câu 2: Nhật Bản nằm ở", options: ["A. Đông Bắc Á.", "B. Nam Á.", "C. Bắc Á.", "D. Tây Nam Á."], correctIndex: 0, explanation: "Về mặt địa lí, Nhật Bản thuộc khu vực Đông Bắc Á." },
+            { lesson: "Nhật Bản", question: "Câu 3: Đảo có diện tích lớn nhất Nhật Bản là", options: ["A. Hô-cai-đô.", "B. Hôn-su.", "C. Xi-cô-cư.", "D. Kiu-xiu."], correctIndex: 1, explanation: "Đảo Hôn-su là đảo lớn nhất, chiếm hơn 60% diện tích toàn bộ lãnh thổ Nhật Bản." },
+            { lesson: "Nhật Bản", question: "Câu 4: Từ bắc xuống nam, bốn đảo lớn nhất của Nhật Bản lần lượt là", options: ["A. Kiu-xiu, Hôn-su, Hô-cai-đô, Xi-cô-cư.", "B. Hôn-su, Hô-cai-đô, Kiu-xiu, Xi-cô-cư.", "C. Hô-cai-đô, Hôn-su, Xi-cô-cư, Kiu-xiu.", "D. Hôn-su, Hô-cai-đô, Xi-cô-cư, Kiu-xiu."], correctIndex: 2, explanation: "Thứ tự địa lí từ Bắc xuống Nam chính xác là: Hô-cai-đô -> Hôn-su -> Xi-cô-cư -> Kiu-xiu." },
+            { lesson: "Nhật Bản", question: "Câu 5: Đảo nằm ở phía bắc của Nhật Bản là", options: ["A. Hôn-su.", "B. Hô-cai-đô.", "C. Xi-cô-cư.", "D. Kiu-xiu."], correctIndex: 1, explanation: "Hô-cai-đô là hòn đảo lớn nằm ở cực Bắc của Nhật Bản, có khí hậu ôn đới." },
+            { lesson: "Nhật Bản", question: "Câu 6: Mùa đông kéo dài, khá khắc nghiệt, tuyết rơi nhiều, mùa hè ấm áp là đặc điểm khí hậu của", options: ["A. phía bắc Nhật Bản.", "B. phía nam Nhật Bản.", "C. khu vực trung tâm Nhật Bản.", "D. khu vực ven biển Nhật Bản."], correctIndex: 0, explanation: "Phía bắc Nhật Bản (như Hô-cai-đô) có khí hậu ôn đới, mùa đông rất lạnh và nhiều tuyết." },
+            { lesson: "Nhật Bản", question: "Câu 7: Loại rừng chiếm ưu thế ở Nhật Bản là", options: ["A. rừng nhiệt đới.", "B. rừng lá rộng.", "C. rừng lá kim.", "D. rừng cận nhiệt ẩm."], correctIndex: 1, explanation: "Nhật Bản có diện tích rừng bao phủ lớn, trong đó rừng lá rộng (rừng ôn đới và cận nhiệt) chiếm ưu thế." },
+            { lesson: "Nhật Bản", question: "Câu 8: Dạng địa hình nào sau đây chiếm phần lớn diện tích tự nhiên của Nhật Bản?", options: ["A. Đồi núi.", "B. Bình nguyên.", "C. Cao nguyên.", "D. Đồng bằng."], correctIndex: 0, explanation: "Địa hình Nhật Bản chủ yếu là đồi núi, chiếm khoảng 73% diện tích lãnh thổ." },
+            { lesson: "Nhật Bản", question: "Câu 9: Khu vực phía Nam của Nhật Bản có khí hậu", options: ["A. cận xích đạo.", "B. ôn đới lục địa.", "C. ôn đới hải dương.", "D. cận nhiệt đới."], correctIndex: 3, explanation: "Phía Nam Nhật Bản (như đảo Kiu-xiu) nằm ở vĩ độ thấp hơn nên có khí hậu cận nhiệt đới gió mùa." },
+            { lesson: "Nhật Bản", question: "Câu 10: Nhật Bản nằm trong khu vực hoạt động chủ yếu của gió nào sau đây?", options: ["A. Gió mùa.", "B. Gió Tây.", "C. Đông cực.", "D. Gió phơn."], correctIndex: 0, explanation: "Nhật Bản nằm ở khu vực Đông Á, chịu ảnh hưởng mạnh mẽ của hoàn lưu gió mùa (gió mùa mùa đông và gió mùa mùa hạ)." },
+            { lesson: "Nhật Bản", question: "Câu 11: Lao động của Nhật Bản KHÔNG có thế mạnh nào sau đây?", options: ["A. Lực lượng lao động trẻ, dồi dào.", "B. Người lao động cần cù, tự giác.", "C. Lực lượng lao động có trình độ cao.", "D. Người lao động có trách nhiệm, tính kỉ luật cao."], correctIndex: 0, explanation: "Nhật Bản đang đối mặt với tình trạng già hóa dân số nghiêm trọng, nên lực lượng lao động trẻ dồi dào KHÔNG phải là thế mạnh hiện nay." },
+            { lesson: "Nhật Bản", question: "Câu 12: Người dân Nhật Bản có trình độ dân trí cao chủ yếu là do", options: ["A. phổ cập giáo dục, xóa mù chữ.", "B. chính sách thu hút nhân tài.", "C. chất lượng cuộc sống rất tốt.", "D. chú trọng đầu tư cho giáo dục."], correctIndex: 3, explanation: "Chính phủ và người dân Nhật Bản cực kì coi trọng giáo dục, đầu tư lớn cho hệ thống giáo dục quốc dân." },
+            { lesson: "Nhật Bản", question: "Câu 13: Biển của Nhật Bản có nguồn hải sản phong phú do nguyên nhân chủ yếu nào sau đây?", options: ["A. Nước biển ấm, nhiều đảo.", "B. Diện tích biển lớn, thiên tai.", "C. Nền nhiệt độ cao, biển ấm.", "D. Có các ngư trường rộng lớn."], correctIndex: 3, explanation: "Nhật Bản có các ngư trường lớn bậc nhất thế giới do sự giao thoa của hai dòng biển nóng (Cư-rô-si-ô) và lạnh (Ô-y-a-si-ô)." },
+            { lesson: "Nhật Bản", question: "Câu 14: Nhận định nào sau đây KHÔNG đúng với khí hậu của Nhật Bản?", options: ["A. Lượng mưa tương đối cao.", "B. Thay đổi từ bắc xuống nam.", "C. Có sự khác nhau theo mùa.", "D. Phía nam có khí hậu ôn đới."], correctIndex: 3, explanation: "Nhận định D sai vì phía nam Nhật Bản có khí hậu cận nhiệt đới (không phải ôn đới)." },
+            { lesson: "Nhật Bản", question: "Câu 15: Sông ngòi Nhật Bản có đặc điểm", options: ["A. Mạng lưới sông ngòi dày đặc, phân bố rộng.", "B. Chủ yếu là các sông nhỏ, ngắn, dốc, có giá trị thủy điện.", "C. Có nhiều sông lớn bồi tụ những đồng bằng phù sa màu mỡ.", "D. Sông ngòi ít có giá trị giao thông vận tải."], correctIndex: 1, explanation: "Do địa hình đồi núi dốc và lãnh thổ hẹp ngang, sông ngòi Nhật Bản thường ngắn, dốc, chảy xiết, rất có giá trị về thủy điện." },
+            { lesson: "Nhật Bản", question: "Câu 16: Dân cư Nhật Bản tập trung ở các thành phố ven biển do nguyên nhân nào sau đây?", options: ["A. Tự nhiên thuận lợi, nền kinh tế phát triển.", "B. Kinh tế phát triển, các đồng bằng lớn.", "C. Đường bờ biển dài, được khai thác sớm.", "D. Nguồn nước dồi dào và ít có thiên tai."], correctIndex: 0, explanation: "Vùng ven biển có địa hình bằng phẳng (các đồng bằng), giao thông đường biển thuận lợi, tập trung các trung tâm công nghiệp lớn." },
+            { lesson: "Nhật Bản", question: "Câu 17: Phát biểu nào sau đây KHÔNG đúng về dân cư, xã hội Nhật Bản?", options: ["A. Thu nhập bình quân đầu người cao.", "B. Nhiều thành tựu khoa học công nghệ.", "C. Trình độ lao động hàng đầu thế giới.", "D. Số dân giảm nhanh do việc xuất cư."], correctIndex: 3, explanation: "Dân số Nhật Bản giảm là do tỉ suất sinh rất thấp và dân số già hóa, không phải do xuất cư." },
+            { lesson: "Nhật Bản", question: "Câu 18: Nhật Bản tích cực ứng dụng khoa học, công nghệ cao vào sản xuất nông nghiệp nhằm", options: ["A. tự chủ nguồn nguyên liệu cho công nghiệp.", "B. tạo ra nhiều sản phẩm thu lợi nhuận cao.", "C. đảm bảo nguồn lương thực trong nước.", "D. tăng năng suất và chất lượng nông sản."], correctIndex: 3, explanation: "Do diện tích đất nông nghiệp rất ít (chỉ khoảng 14%), Nhật Bản phải ứng dụng công nghệ cao để thâm canh, tăng năng suất và chất lượng." },
+            { lesson: "Nhật Bản", question: "Câu 19: Đặc tính cần cù, có tinh thần trách nhiệm rất cao, coi trọng giáo dục của người lao động", options: ["A. tạo nên sự cách biệt của người Nhật với người dân tất cả các nước khác.", "B. là trở ngại khi Nhật Bản hợp tác quốc tế về lao động với các nước khác.", "C. là nhân tố quan trọng hàng đầu thúc đẩy nền kinh tế Nhật Bản phát triển.", "D. có ảnh hưởng không nhiều đối sự nghiệp phát triển kinh tế của Nhật Bản."], correctIndex: 2, explanation: "Con người được xem là tài nguyên quý giá nhất và là động lực chính cho sự phát triển 'thần kì' của kinh tế Nhật Bản." },
+            { lesson: "Nhật Bản", question: "Câu 20: Ngành công nghiệp nào sau đây chiếm phần lớn giá trị hàng công nghiệp xuất khẩu của Nhật Bản?", options: ["A. Công nghiệp điện tử.", "B. Công nghiệp chế tạo.", "C. Công nghiệp luyện kim.", "D. Công nghiệp hóa chất."], correctIndex: 1, explanation: "Công nghiệp chế tạo (chế tạo ô tô, tàu biển, máy móc...) chiếm khoảng 40% giá trị hàng công nghiệp xuất khẩu của Nhật Bản." },
+            { lesson: "Nhật Bản", question: "Câu 21: Các trung tâm công nghiệp rất lớn của Nhật Bản tập trung nhiều nhất ở đảo nào sau đây?", options: ["A. Hôn-su.", "B. Hô-cai-đô.", "C. Xi-cô-cư.", "D. Kiu-xiu."], correctIndex: 0, explanation: "Đảo Hôn-su tập trung các chuỗi đô thị - công nghiệp khổng lồ như Tô-ki-ô, I-ô-cô-ha-ma, Ô-xa-ca." },
+            { lesson: "Nhật Bản", question: "Câu 22: Ngành công nghiệp mũi nhọn hiện nay của Nhật Bản là", options: ["A. chế tạo.", "B. điện tử.", "C. xây dựng.", "D. dệt."], correctIndex: 1, explanation: "Công nghiệp điện tử, tin học và chế tạo vi mạch, robot là những ngành mũi nhọn mang lại lợi nhuận cao nhất." },
+            { lesson: "Nhật Bản", question: "Câu 23: Loại hình giao thông vận tải có ý nghĩa quan trọng nhất với ngành ngoại thương của Nhật Bản là", options: ["A. đường biển.", "B. đường ô tô.", "C. đường hàng không.", "D. đường sắt."], correctIndex: 0, explanation: "Là một quốc đảo, đường biển đóng vai trò số 1 trong việc nhập khẩu nguyên liệu và xuất khẩu hàng hóa." },
+            { lesson: "Nhật Bản", question: "Câu 24: Công nghiệp gỗ, giấy tập trung chủ yếu ở đảo Hô-cai-đô do nguyên nhân chủ yếu nào sau đây?", options: ["A. Nguồn nguyên liệu phong phú.", "B. Vị trí địa lí nhiều thuận lợi.", "C. Nguồn lao động rất dồi dào.", "D. Cơ sở hạ tầng phát triển mạnh."], correctIndex: 0, explanation: "Đảo Hô-cai-đô có diện tích rừng lá kim bao phủ rất lớn, cung cấp nguồn gỗ dồi dào cho công nghiệp giấy." },
+            { lesson: "Nhật Bản", question: "Câu 25: Nông nghiệp đóng vai trò chính trong hoạt kinh tế là đặc điểm của vùng", options: ["A. Hôn-su.", "B. Kiu-xiu.", "C. Xi-cô-cư.", "D. Hô-cai-đô."], correctIndex: 3, explanation: "So với các đảo khác tập trung mạnh vào công nghiệp, Hô-cai-đô là vùng mà nông - lâm - ngư nghiệp vẫn đóng vai trò chính." },
+            { lesson: "Nhật Bản", question: "Câu 26: Hình thức chăn nuôi chủ yếu ở Nhật Bản là", options: ["A. hộ gia đình.", "B. du mục.", "C. quảng canh.", "D. trang trại."], correctIndex: 3, explanation: "Nhật Bản áp dụng công nghệ cao vào chăn nuôi nên hình thức trang trại hiện đại chiếm ưu thế." },
+            { lesson: "Nhật Bản", question: "Câu 27: Thị trường khách du lịch quốc tế đến Nhật Bản chủ yếu từ các nước thuộc", options: ["A. châu Âu.", "B. châu Á.", "C. châu Mỹ.", "D. châu Đại Dương."], correctIndex: 1, explanation: "Do khoảng cách địa lí và giao thoa văn hóa, khách du lịch từ các nước châu Á (Hàn Quốc, Trung Quốc, Việt Nam...) chiếm tỉ lệ cao nhất." },
+            { lesson: "Nhật Bản", question: "Câu 28: Đặc điểm nào sau đây KHÔNG đúng với vùng kinh tế Hôn-su?", options: ["A. Phát triển mạnh khai thác than và luyện thép.", "B. Diện tích lớn nhất, dân số tập trung đông nhất.", "C. Kinh tế phát triển nhất trong tất cả các vùng.", "D. Ô-xa-ca và Cô-bê là những thành phố lớn."], correctIndex: 0, explanation: "Hôn-su là vùng trung tâm phát triển công nghiệp chế tạo, điện tử. Khai thác than và luyện thép là đặc điểm nổi bật của vùng Kiu-xiu." },
+            { lesson: "Nhật Bản", question: "Câu 29: Đặc điểm nổi bật về công nghiệp của vùng kinh tế Hôn-su là", options: ["A. có nhiều trung tâm công nghiệp lớn.", "B. phát triển khai thác than và luyện thép.", "C. tập trung vào khai thác quặng đồng.", "D. chủ yếu khai thác than đá, quặng sắt."], correctIndex: 0, explanation: "Hôn-su tập trung hàng loạt các siêu trung tâm công nghiệp lớn nhất Nhật Bản." },
+            { lesson: "Nhật Bản", question: "Câu 30: Đặc điểm nổi bật của vùng kinh tế Hô-cai-đô là", options: ["A. diện tích rộng nhất, dân số đông nhất.", "B. rừng bao phủ phần lớn diện tích của vùng.", "C. kinh tế phát triển nhất trong các vùng.", "D. tập trung các trung tâm công nghiệp rất lớn."], correctIndex: 1, explanation: "Hô-cai-đô nổi tiếng với diện tích rừng rộng lớn và thiên nhiên hoang sơ." },
+            { lesson: "Nhật Bản", question: "Câu 31: Đặc điểm nổi bật của vùng kinh tế Kiu-xiu là", options: ["A. phát triển mạnh khai thác than và thép.", "B. phát triển công nghiệp tự động và bán dẫn.", "C. kinh tế phát triển nhất trong các vùng.", "D. có thành phố lớn là Ô-xa-ca và Cô-bê."], correctIndex: 0, explanation: "Kiu-xiu từng là trung tâm khai thác than và luyện kim thép truyền thống của Nhật Bản." },
+
+            // --- TRUNG QUỐC ---
+            { lesson: "Trung Quốc", question: "Câu 1: Phần phía đông Trung Quốc tiếp giáp với đại dương nào sau đây?", options: ["A. Thái Bình Dương.", "B. Đại Tây Dương.", "C. Ấn Độ Dương.", "D. Bắc Băng Dương."], correctIndex: 0, explanation: "Phía đông Trung Quốc có đường bờ biển dài tiếp giáp với các vùng biển thuộc Thái Bình Dương." },
+            { lesson: "Trung Quốc", question: "Câu 2: Trung Quốc là nước có diện tích lớn thứ tư trên thế giới sau các nước nào sau đây?", options: ["A. Nga, Ca-na-da, Hoa Kỳ.", "B. Nga, Ca-na-da, Ô-xtrây-li-a.", "C. Nga, Hoa Kỳ, Bra-xin.", "D. Nga, Hoa Kỳ, Mông Cổ."], correctIndex: 0, explanation: "Diện tích Trung Quốc đạt 9,6 triệu km2, đứng thứ 4 thế giới sau Liên bang Nga, Canada và Hoa Kỳ." },
+            { lesson: "Trung Quốc", question: "Câu 3: Các vùng biển như biển Hoa Đông, Hoàng Hải thuộc đại dương nào dưới đây?", options: ["A. Thái Bình Dương.", "B. Ấn Độ Dương.", "C. Đại Tây Dương.", "D. Bắc Băng Dương."], correctIndex: 0, explanation: "Biển Bột Hải, Hoàng Hải, Hoa Đông và Nam Trung Hoa đều là các biển rìa của Thái Bình Dương." },
+            { lesson: "Trung Quốc", question: "Câu 4: Phía bắc Trung Quốc tiếp giáp với quốc gia nào dưới đây?", options: ["A. Nhật Bản.", "B. Mông Cổ.", "C. Liên bang Nga.", "D. Việt Nam."], correctIndex: 1, explanation: "Đường biên giới phía Bắc của Trung Quốc tiếp giáp với Mông Cổ và một phần Liên bang Nga." },
+            { lesson: "Trung Quốc", question: "Câu 5: Các hoang mạc lớn ở Trung Quốc phân bố chủ yếu ở khu vực nào sau đây?", options: ["A. Đông Bắc.", "B. Tây Nam.", "C. Tây Bắc.", "D. Đông Nam."], correctIndex: 2, explanation: "Khu vực Tây Bắc nằm sâu trong nội địa, khí hậu khô hạn khắc nghiệt, là nơi có các hoang mạc lớn như Ta-cla Ma-can." },
+            { lesson: "Trung Quốc", question: "Câu 6: Địa hình chủ yếu của miền Đông Trung Quốc là", options: ["A. núi, cao nguyên xen bồn địa.", "B. đồng bằng và đồi núi thấp.", "C. núi cao và sơn nguyên đồ sộ.", "D. núi và đồng bằng châu thổ."], correctIndex: 1, explanation: "Trái ngược với miền Tây, miền Đông có địa hình thấp dần ra biển, chủ yếu là đồi núi thấp và các đồng bằng châu thổ rộng lớn." },
+            { lesson: "Trung Quốc", question: "Câu 7: Các trung tâm công nghiệp lớn của Trung Quốc tập trung chủ yếu ở", options: ["A. miền Tây.", "B. miền Đông.", "C. miền Bắc.", "D. miền Nam."], correctIndex: 1, explanation: "Miền Đông ven biển có cơ sở hạ tầng, giao thông thuận lợi và dân cư đông đúc, tập trung hầu hết các siêu đô thị và khu công nghiệp lớn." },
+            { lesson: "Trung Quốc", question: "Câu 8: Các đồng bằng của Trung Quốc theo thứ tự từ bắc xuống nam là", options: ["A. Đông Bắc, Hoa Bắc, Hoa Trung, Hoa Nam.", "B. Hoa Bắc, Hoa Trung, Hoa Nam, Đông Bắc.", "C. Hoa Trung, Hoa Nam, Đông Bắc, Hoa Bắc.", "D. Hoa Nam, Đông Bắc, Hoa Bắc, Hoa Trung."], correctIndex: 0, explanation: "Tính từ Bắc xuống Nam, 4 đồng bằng phù sa lớn lần lượt là: Đông Bắc, Hoa Bắc, Hoa Trung và Hoa Nam." },
+            { lesson: "Trung Quốc", question: "Câu 9: Biên giới Trung Quốc với các nước chủ yếu là", options: ["A. núi cao và hoang mạc.", "B. núi thấp và đồng bằng.", "C. đồng bằng và hoang mạc.", "D. núi thấp và hoang mạc."], correctIndex: 0, explanation: "Biên giới trên đất liền của Trung Quốc chủ yếu chạy qua các vùng núi cao hiểm trở (Himalaya) và hoang mạc rộng lớn (Gobi)." },
+            { lesson: "Trung Quốc", question: "Câu 10: Ngành kinh tế nào dưới đây là động lực quan trọng giúp tăng cường khả năng liên kết giữa các vùng miền và thúc đẩy sự phát triển kinh tế - xã hội Trung Quốc?", options: ["A. Du lịch.", "B. Thương mại.", "C. Giao thông vận tải.", "D. Tài chính - ngân hàng."], correctIndex: 2, explanation: "Với lãnh thổ rộng lớn, giao thông vận tải đóng vai trò huyết mạch để liên kết miền Đông phát triển và miền Tây giàu tài nguyên." },
+            { lesson: "Trung Quốc", question: "Câu 11: Đồng bằng thường bị ngập lụt nghiêm trọng nhất ở Trung Quốc là", options: ["A. Hoa Bắc.", "B. Đông Bắc.", "C. Hoa Nam.", "D. Hoa Trung."], correctIndex: 3, explanation: "Đồng bằng Hoa Trung (thuộc lưu vực sông Trường Giang) thường xuyên phải đối mặt với các trận lũ lụt lịch sử nghiêm trọng." },
+            { lesson: "Trung Quốc", question: "Câu 12: Dân tộc chiếm đa số ở Trung Quốc là", options: ["A. Choang.", "B. Hán.", "C. Tạng.", "D. Hồi."], correctIndex: 1, explanation: "Người Hán là dân tộc đa số, chiếm hơn 90% dân số toàn Trung Quốc." },
+            { lesson: "Trung Quốc", question: "Câu 13: Dân cư Trung Quốc phân bố tập trung chủ yếu ở các", options: ["A. đồng bằng phù sa ở miền Đông.", "B. sơn nguyên, bồn địa ở miền Tây.", "C. khu vực biên giới phía bắc.", "D. khu vực ven biển ở phía nam."], correctIndex: 0, explanation: "Miền Đông có các đồng bằng phù sa màu mỡ, khí hậu thuận lợi nên tập trung dân cư đông đúc nhất." },
+            { lesson: "Trung Quốc", question: "Câu 14: Điều kiện thuận lợi nhất để Trung Quốc phát triển công nghiệp luyện kim đen là", options: ["A. kĩ thuật hiện đại.", "B. lao động đông đảo.", "C. nguyên liệu dồi dào.", "D. nhu cầu rất lớn."], correctIndex: 2, explanation: "Trung Quốc có trữ lượng quặng sắt và than đá (nguyên liệu cốt lõi cho luyện kim đen) cực kì dồi dào, đứng hàng đầu thế giới." },
+            { lesson: "Trung Quốc", question: "Câu 15: Miền Đông Trung Quốc là nơi sinh sống tập trung của dân tộc", options: ["A. Choang.", "B. Hán.", "C. Tạng.", "D. Hồi."], correctIndex: 1, explanation: "Người Hán sống tập trung chủ yếu ở các đồng bằng miền Đông sầm uất." },
+            { lesson: "Trung Quốc", question: "Câu 16: Phát biểu nào sau đây KHÔNG đúng với miền Tây Trung Quốc?", options: ["A. Nhiều tài nguyên khoáng sản.", "B. Diện tích tự nhiên rộng lớn.", "C. Có các dân tộc khác nhau.", "D. Có mật độ dân cư rất lớn."], correctIndex: 3, explanation: "Nhận định D sai vì miền Tây địa hình hiểm trở, hoang mạc khắc nghiệt nên mật độ dân cư rất thưa thớt." },
+            { lesson: "Trung Quốc", question: "Câu 17: Khí hậu chủ yếu ở miền Tây Trung Quốc là", options: ["A. ôn đới lục địa.", "B. ôn đới gió mùa.", "C. cận nhiệt gió mùa.", "D. nhiệt đới gió mùa."], correctIndex: 0, explanation: "Do nằm sâu trong lục địa, bị núi cao chắn gió biển, miền Tây mang đặc điểm khí hậu ôn đới lục địa khắc nghiệt." },
+            { lesson: "Trung Quốc", question: "Câu 18: Dân cư Trung Quốc tập trung chủ yếu ở", options: ["A. miền Bắc.", "B. miền Đông.", "C. miền Nam.", "D. miền Tây."], correctIndex: 1, explanation: "Miền Đông Trung Quốc chiếm phần lớn dân số cả nước." },
+            { lesson: "Trung Quốc", question: "Câu 19: Dân cư Trung Quốc tập trung đông nhất ở vùng", options: ["A. ven biển và thượng lưu các con sông.", "B. ven biển và hạ lưu các con sông.", "C. ven biển và vùng đồi núi phía Tây.", "D. phía Tây Bắc và vùng trung tâm."], correctIndex: 1, explanation: "Hạ lưu các con sông lớn tạo nên các đồng bằng châu thổ trù phú, kết hợp với lợi thế cảng biển nên dân cư cực kì đông." },
+            { lesson: "Trung Quốc", question: "Câu 20: Các dân tộc ít người của Trung Quốc phân bố rải rác ở khu vực nào sau đây?", options: ["A. Các thành phố lớn.", "B. Các đồng bằng châu thổ.", "C. Vùng núi và biên giới.", "D. Dọc biên giới phía nam."], correctIndex: 2, explanation: "Khoảng hơn 50 dân tộc thiểu số của Trung Quốc chủ yếu sinh sống ở các vùng đồi núi và biên giới miền Tây." },
+            { lesson: "Trung Quốc", question: "Câu 21: Cây trồng giữ vị trí quan trọng nhất trong ngành trồng trọt ở Trung Quốc là", options: ["A. cây lương thực.", "B. cây ăn quả.", "C. cây công nghiệp.", "D. cây thực phẩm."], correctIndex: 0, explanation: "Với quy mô dân số hơn 1,4 tỉ người, việc đảm bảo an ninh lương thực là ưu tiên số 1, do đó cây lương thực luôn giữ vị trí chủ đạo." },
+            { lesson: "Trung Quốc", question: "Câu 22: Loại vật nuôi nhiều nhất ở miền Tây Trung Quốc là", options: ["A. cừu.", "B. bò.", "C. ngựa.", "D. lợn."], correctIndex: 0, explanation: "Miền Tây có các đồng cỏ khô hạn trên cao nguyên, phù hợp nhất với việc chăn thả cừu." },
+            { lesson: "Trung Quốc", question: "Câu 23: Trung Quốc đang đứng đầu thế giới về chiều dài", options: ["A. đường ô tô cao tốc.", "B. đường sắt đệm từ.", "C. đường thủy nội địa.", "D. đường biển."], correctIndex: 0, explanation: "Sự phát triển thần tốc của hạ tầng đã giúp Trung Quốc vươn lên đứng đầu thế giới về tổng chiều dài đường ô tô cao tốc." },
+            { lesson: "Trung Quốc", question: "Câu 24: Những thay đổi quan trọng trong nền kinh tế Trung Quốc là kết quả của", options: ["A. công cuộc đại nhảy vọt.", "B. các kế hoạch 5 năm.", "C. công cuộc cải cách, hiện đại hóa.", "D. cuộc cách mạng văn hóa."], correctIndex: 2, explanation: "Công cuộc cải cách mở cửa và hiện đại hóa đất nước từ năm 1978 đã làm thay đổi hoàn toàn bộ mặt kinh tế Trung Quốc." },
+            { lesson: "Trung Quốc", question: "Câu 25: Ngành công nghiệp nào sau đây của Trung Quốc có sản lượng đứng đầu thế giới?", options: ["A. Khai thác than.", "B. Hóa dầu.", "C. Luyện kim.", "D. Thực phẩm."], correctIndex: 0, explanation: "Trung Quốc là quốc gia khai thác và tiêu thụ than đá lớn nhất thế giới." },
+            { lesson: "Trung Quốc", question: "Câu 26: Hiện nay quy mô GDP của Trung Quốc đứng thứ mấy trên thế giới?", options: ["A. Thứ nhất.", "B. Thứ hai.", "C. Thứ ba.", "D. Thứ tư."], correctIndex: 1, explanation: "Tính đến hiện tại, quy mô kinh tế của Trung Quốc đứng thứ 2 thế giới, chỉ xếp sau Hoa Kỳ." },
+            { lesson: "Trung Quốc", question: "Câu 27: Trong khoảng hai thập niên cuối thế kỷ XX, Trung Quốc đứng đầu thế giới về", options: ["A. tổng sản phẩm quốc nội.", "B. GDP bình quân đầu người.", "C. tốc độ tăng trưởng kinh tế.", "D. đầu tư nước ngoài (FDI)."], correctIndex: 2, explanation: "Suốt những năm 1980-2000, Trung Quốc duy trì tốc độ tăng trưởng kinh tế (GDP) ở mức hai con số, cao nhất thế giới." },
+            { lesson: "Trung Quốc", question: "Câu 28: Điều kiện thuận lợi nhất để Trung Quốc phát triển ngành công nghiệp khai khoáng là", options: ["A. kĩ thuật hiện đại.", "B. lao động dồi dào.", "C. khoáng sản phong phú.", "D. nhu cầu rất lớn."], correctIndex: 2, explanation: "Tài nguyên khoáng sản phong phú (than, quặng sắt, đất hiếm...) là nền tảng trực tiếp để phát triển công nghiệp khai khoáng." },
+            { lesson: "Trung Quốc", question: "Câu 29: Các trung tâm công nghiệp của Trung Quốc tập trung chủ yếu ở", options: ["A. miền Tây.", "B. vùng duyên hải.", "C. phía nam.", "D. trung tâm đất nước."], correctIndex: 1, explanation: "Vùng duyên hải (miền Đông ven biển) chiếm tuyệt đại đa số các trung tâm công nghiệp quy mô lớn." },
+            { lesson: "Trung Quốc", question: "Câu 30: Khu vực nào sau đây chiếm tỉ trọng cao nhất trong nền kinh tế Trung Quốc?", options: ["A. Nông nghiệp, lâm nghiệp và thủy sản.", "B. Công nghiệp và xây dựng.", "C. Dịch vụ.", "D. Thuế sản phẩm trừ trợ cấp sản phẩm."], correctIndex: 2, explanation: "Cơ cấu kinh tế Trung Quốc đã chuyển dịch mạnh mẽ, trong đó khu vực Dịch vụ đang chiếm tỉ trọng cao nhất." },
+            { lesson: "Trung Quốc", question: "Câu 31: Lĩnh vực nào sau đây được coi là động lực cho tăng trưởng kinh tế Trung Quốc?", options: ["A. Xuất nhập khẩu.", "B. Du lịch.", "C. Tài chính.", "D. Nông nghiệp."], correctIndex: 0, explanation: "Mở cửa giao thương, thúc đẩy sản xuất hàng hóa để xuất khẩu là động lực chính kéo nền kinh tế Trung Quốc đi lên." },
+            { lesson: "Trung Quốc", question: "Câu 32: Trung Quốc đã và đang thực hiện biện pháp chủ yếu nào sau đây để tăng tỉ lệ che phủ rừng?", options: ["A. Khai thác có kế hoạch.", "B. Bảo vệ rừng.", "C. Trồng rừng.", "D. Phát triển nương rẫy."], correctIndex: 2, explanation: "Trung Quốc đã thực hiện các siêu dự án 'Trồng rừng sinh thái' (như Vạn lí trường thành xanh) để phủ xanh đồi trọc." },
+            { lesson: "Trung Quốc", question: "Câu 33: Loại cây nào sau đây được trồng nhiều ở đồng bằng Đông Bắc?", options: ["A. Mía.", "B. Chè.", "C. Lúa gạo.", "D. Lúa mì."], correctIndex: 3, explanation: "Đồng bằng Đông Bắc có khí hậu lạnh và khô hơn, rất thích hợp để trồng lúa mì và củ cải đường." },
+            { lesson: "Trung Quốc", question: "Câu 34: Đặc điểm chung của địa hình Trung Quốc là", options: ["A. thấp dần từ bắc xuống nam.", "B. thấp dần từ tây sang đông.", "C. cao dần từ bắc xuống nam.", "D. cao dần từ tây sang đông."], correctIndex: 1, explanation: "Địa hình Trung Quốc như những bậc thang khổng lồ, cao ở phía Tây (dãy Himalaya, cao nguyên Tây Tạng) và thấp dần về phía các đồng bằng phía Đông." },
+            { lesson: "Trung Quốc", question: "Câu 35: Phát biểu nào sau đây đúng với ngành thủy sản Trung Quốc?", options: ["A. Sản lượng khai thác và nuôi trồng đứng đầu thế giới.", "B. Là ngành một mới nhưng tốc độ phát triển rất nhanh.", "C. Chủ yếu là đánh bắt và nuôi trồng thủy sản nước ngọt.", "D. Các ngư trường trọng điểm nằm ở phía tây và phía bắc."], correctIndex: 0, explanation: "Trung Quốc sở hữu lực lượng tàu cá lớn nhất thế giới, sản lượng thủy sản luôn đứng vị trí top 1 toàn cầu." },
+            { lesson: "Trung Quốc", question: "Câu 36: Vùng trồng lúa mì của Trung Quốc tập trung chủ yếu ở các đồng bằng nào sau đây?", options: ["A. Hoa Trung và Hoa Nam.", "B. Hoa Bắc và Hoa Trung.", "C. Đông Bắc và Hoa Trung.", "D. Đông Bắc và Hoa Bắc."], correctIndex: 3, explanation: "Hai đồng bằng phía Bắc (Đông Bắc và Hoa Bắc) có khí hậu ôn đới/cận nhiệt khô, là vựa lúa mì chính của nước này." },
+            { lesson: "Trung Quốc", question: "Câu 37: Lĩnh vực sản xuất điện nào sau đây của Trung Quốc sử dụng năng lượng tái tạo?", options: ["A. Nhiệt điện sử dụng nhiên liệu than.", "B. Nhiệt điện sử dụng nhiên liệu dầu.", "C. Nhiệt điện sử dụng nhiên liệu khí đốt.", "D. Sản xuất điện từ năng lượng Mặt Trời."], correctIndex: 3, explanation: "Điện Mặt Trời (cùng với điện gió, thủy điện) là nguồn năng lượng tái tạo sạch đang được Trung Quốc đầu tư mạnh mẽ." },
+            { lesson: "Trung Quốc", question: "Câu 38: Trung Quốc quan tâm rất lớn đến sản xuất lương thực vì", options: ["A. quy mô dân số rất lớn, nhu cầu lương thực tăng cao.", "B. quy mô dân số rất lớn, giống cây lương thực chưa tốt.", "C. giống cây lương thực hạn chế, nhu cầu lương thực lớn.", "D. nhu cầu lương thực lớn, năng suất lương thực chưa cao."], correctIndex: 0, explanation: "Để nuôi sống hơn 1,4 tỉ người, an ninh lương thực là vấn đề mang tính chất sống còn của quốc gia này." },
+            { lesson: "Trung Quốc", question: "Câu 39: Công nghiệp sản xuất hàng tiêu dùng của Trung Quốc phát triển mạnh dựa vào lợi thế chủ yếu nào sau đây?", options: ["A. Thu hút được nhiều vốn, công nghệ từ nước ngoài.", "B. Có nhiều làng nghề với truyền thống sản xuất lâu đời.", "C. Nguồn tài nguyên khoáng sản phong phú và đa dạng.", "D. Nguồn lao động đông đảo, thị trường tiêu thụ rộng lớn."], correctIndex: 3, explanation: "Sản xuất hàng tiêu dùng cần nhiều nhân công và thị trường nội địa lớn. Trung Quốc có sẵn nguồn lao động rẻ và 1,4 tỉ khách hàng." },
+            { lesson: "Trung Quốc", question: "Câu 40: Miền Tây Trung Quốc có thế mạnh chủ yếu nào sau đây để phát triển lâm nghiệp và chăn nuôi?", options: ["A. Diện tích rừng lớn, nhiều đồng cỏ.", "B. Đất đai rộng, màu mỡ, nhiều sông.", "C. Khí hậu gió mùa, nguồn nước lớn.", "D. Sông ngòi dày đặc, nhiều sinh vật."], correctIndex: 0, explanation: "Miền Tây đồi núi tuy khắc nghiệt nhưng có diện tích rừng tự nhiên và các thảo nguyên/đồng cỏ trên cao nguyên rất rộng lớn." }
+        ];
+
+        let activeQuizData = [];
+        let currentQuestionIndex = 0;
+        let studentName = "";
+        
+        let answersState = []; 
+        let flaggedQuestions = new Set();
+        
+        let timerInterval;
+        let timeElapsed = 0;
+        let miniIslandTimeout;
+
+        // DOM Elements
+        const homeScreen = document.getElementById('home-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const paletteContainer = document.getElementById('palette-modal');
+        const scrollContent = document.getElementById('scroll-content');
+        
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const explanationBox = document.getElementById('explanation-box');
+        const explanationText = document.getElementById('explanation-text');
+        const progressBar = document.getElementById('progress-bar');
+        const currentQLabel = document.getElementById('current-q');
+        const totalQLabel = document.getElementById('total-q');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const flagBtn = document.getElementById('flag-btn');
+
+        function showFunnyToast() {
+            const toast = document.getElementById('funny-toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // ================= MINI DYNAMIC ISLAND =================
+        function toggleMiniIsland(e) {
+            if(e) e.stopPropagation();
+            const isl = document.getElementById('mini-island');
+            isl.classList.toggle('expanded');
+            
+            clearTimeout(miniIslandTimeout);
+            if(isl.classList.contains('expanded')) {
+                miniIslandTimeout = setTimeout(() => {
+                    isl.classList.remove('expanded');
+                }, 3000);
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeElapsed = 0;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeElapsed++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            let m = Math.floor(timeElapsed / 60).toString().padStart(2, '0');
+            let s = (timeElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${m}:${s}`;
+            document.getElementById('island-time-exp').innerText = `${m}:${s}`;
+        }
+
+        function formatTime(seconds) {
+            let m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            let s = (seconds % 60).toString().padStart(2, '0');
+            return `${m} phút ${s} giây`;
+        }
+
+        function togglePalette() {
+            if(paletteContainer.style.display === 'flex') {
+                paletteContainer.style.display = 'none';
+            } else {
+                paletteContainer.style.display = 'flex';
+                updatePaletteUI();
+            }
+        }
+
+        function renderPalette() {
+            const grid = document.getElementById('palette-grid');
+            grid.innerHTML = '';
+            activeQuizData.forEach((_, idx) => {
+                let btn = document.createElement('div');
+                btn.className = 'pal-btn';
+                btn.innerText = idx + 1;
+                btn.onclick = () => {
+                    currentQuestionIndex = idx;
+                    loadQuestion();
+                    togglePalette();
+                };
+                grid.appendChild(btn);
+            });
+            updatePaletteUI();
+        }
+
+        function updatePaletteUI() {
+            const btns = document.getElementById('palette-grid').children;
+            if(!btns.length) return;
+            for(let i=0; i<btns.length; i++) {
+                btns[i].className = 'pal-btn'; 
+                if (i === currentQuestionIndex) btns[i].classList.add('current');
+                
+                let ans = answersState[i];
+                if (ans !== -1) {
+                    if (ans === activeQuizData[i].correctIndex) btns[i].classList.add('correct');
+                    else btns[i].classList.add('wrong');
+                }
+                if (flaggedQuestions.has(i)) btns[i].classList.add('flagged');
+            }
+        }
+
+        function startQuiz(mode) {
+            studentName = document.getElementById('student-name').value.trim();
+            if(!studentName) studentName = "Thí sinh";
+
+            if (mode === 'retry') {
+                let wrongItems = [];
+                answersState.forEach((ans, idx) => {
+                    if(ans !== activeQuizData[idx].correctIndex) wrongItems.push(activeQuizData[idx]);
+                });
+                activeQuizData = wrongItems;
+            } else if (mode === 'all') {
+                activeQuizData = [...masterQuizData];
+            } else {
+                activeQuizData = masterQuizData.filter(q => q.lesson === mode);
+            }
+
+            const isShuffle = document.getElementById('shuffle-toggle').checked;
+            if (isShuffle && mode !== 'retry') shuffleArray(activeQuizData);
+
+            homeScreen.style.display = 'none';
+            resultScreen.style.display = 'none';
+            quizScreen.style.display = 'flex'; 
+            
+            currentQuestionIndex = 0;
+            answersState = new Array(activeQuizData.length).fill(-1);
+            flaggedQuestions.clear();
+            totalQLabel.innerText = activeQuizData.length;
+            
+            renderPalette();
+            startTimer();
+            loadQuestion();
+        }
+
+        function forceQuit() {
+            if(confirm("Dữ liệu sẽ không được lưu. Bạn chắc chắn muốn thoát?")) location.reload();
+        }
+
+        function confirmSubmit() {
+            document.getElementById('mini-island').classList.remove('expanded');
+            let remain = answersState.filter(a => a === -1).length;
+            let msg = remain > 0 ? `Cảnh báo: Bạn còn ${remain} câu chưa làm!\nBạn có chắc muốn nộp bài?` : `Tuyệt vời! Bạn đã làm xong.\nTiến hành nộp bài?`;
+            if(confirm(msg)) showResults();
+        }
+
+        function toggleFlag() {
+            if (flaggedQuestions.has(currentQuestionIndex)) {
+                flaggedQuestions.delete(currentQuestionIndex);
+            } else {
+                flaggedQuestions.add(currentQuestionIndex);
+            }
+            loadQuestion(); 
+        }
+
+        function changeQuestion(step) {
+            let next = currentQuestionIndex + step;
+            if (next >= 0 && next < activeQuizData.length) {
+                currentQuestionIndex = next;
+                loadQuestion();
+            }
+        }
+
+        function loadQuestion() {
+            const qData = activeQuizData[currentQuestionIndex];
+            scrollContent.scrollTop = 0; 
+            
+            document.getElementById('question-text').innerText = qData.question;
+            currentQLabel.innerText = currentQuestionIndex + 1;
+            
+            let done = answersState.filter(a => a !== -1).length;
+            progressBar.style.width = (done / activeQuizData.length * 100) + '%';
+            
+            document.getElementById('island-prog').innerText = `${done}/${activeQuizData.length}`;
+
+            btnPrev.disabled = currentQuestionIndex === 0;
+            btnNext.disabled = currentQuestionIndex === activeQuizData.length - 1;
+
+            if(flaggedQuestions.has(currentQuestionIndex)) {
+                flagBtn.classList.add('active');
+                flagBtn.innerText = "🚩 Đã đánh dấu";
+            } else {
+                flagBtn.classList.remove('active');
+                flagBtn.innerText = "🚩 Đánh dấu";
+            }
+
+            optionsContainer.innerHTML = '';
+            let answeredIdx = answersState[currentQuestionIndex];
+
+            qData.options.forEach((opt, idx) => {
+                let btn = document.createElement('button');
+                btn.innerText = opt;
+                btn.className = 'option-btn';
+                
+                if (answeredIdx !== -1) {
+                    btn.disabled = true;
+                    if (idx === qData.correctIndex) btn.classList.add('correct');
+                    else if (idx === answeredIdx) btn.classList.add('wrong');
+                } else {
+                    btn.onclick = () => selectAnswer(idx);
+                }
+                optionsContainer.appendChild(btn);
+            });
+
+            if (answeredIdx !== -1) {
+                let isRight = answeredIdx === qData.correctIndex;
+                let cText = qData.options[qData.correctIndex].replace(/^[A-D]\.\s*/, '');
+                if(isRight) explanationText.innerHTML = `✅ <b>Chính xác!</b><br>${qData.explanation}`;
+                else explanationText.innerHTML = `❌ <b>Sai rồi! (Đáp án: ${cText})</b><br>${qData.explanation}`;
+                explanationBox.classList.add('show');
+            } else {
+                explanationBox.classList.remove('show');
+            }
+
+            updatePaletteUI();
+        }
+
+        function selectAnswer(idx) {
+            answersState[currentQuestionIndex] = idx;
+            loadQuestion();
+        }
+
+        function showResults() {
+            clearInterval(timerInterval);
+            quizScreen.style.display = 'none';
+            resultScreen.style.display = 'block';
+
+            let scoreCount = 0;
+            let wrongIndexes = [];
+            answersState.forEach((ans, i) => {
+                if (ans === activeQuizData[i].correctIndex) scoreCount++;
+                else wrongIndexes.push(i);
+            });
+
+            document.getElementById('res-student-name').innerText = studentName;
+            document.getElementById('res-time').innerText = formatTime(timeElapsed);
+            document.getElementById('score-text').innerText = `${scoreCount}/${activeQuizData.length}`;
+            
+            let acc = Math.round((scoreCount / activeQuizData.length) * 100);
+            document.getElementById('accuracy-text').innerText = `Chính xác: ${acc}%`;
+
+            let evalMsg = "";
+            if(acc >= 80) evalMsg = "🌟 Phong độ chói sáng! Bạn nắm kiến thức môn Địa lí rất chắc.";
+            else if(acc >= 50) evalMsg = "👍 Khá ổn! Nhưng hãy xem lại các câu sai để bứt phá điểm số nhé.";
+            else evalMsg = "⚠️ Nguy hiểm! Kiến thức đang hổng khá nhiều. Hãy chép lại các câu sai ra vở ngay!";
+            document.getElementById('eval-text').innerText = evalMsg;
+
+            if (acc >= 50) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+
+            if (wrongIndexes.length > 0) document.getElementById('btn-retry-wrong').style.display = 'block';
+            else document.getElementById('btn-retry-wrong').style.display = 'none';
+
+            let rvList = document.getElementById('review-list');
+            let rvSec = document.getElementById('review-section');
+            rvList.innerHTML = '';
+            
+            let reviewSet = new Set([...wrongIndexes, ...Array.from(flaggedQuestions)]);
+            if (reviewSet.size > 0) {
+                rvSec.style.display = 'block';
+                reviewSet.forEach(i => {
+                    const item = activeQuizData[i];
+                    let d = document.createElement('div');
+                    d.className = 'review-item';
+                    
+                    let isWrong = wrongIndexes.includes(i);
+                    let isFlagged = flaggedQuestions.has(i);
+                    let notAns = answersState[i] === -1;
+
+                    if(!isWrong && isFlagged) d.classList.add('flag-only');
+
+                    let tag = '';
+                    if(isFlagged) tag += '🚩 ';
+                    if(notAns) tag += '⚪ Bỏ trống ';
+                    else if(isWrong) tag += '❌ ';
+
+                    d.innerHTML = `
+                        <div class="r-q">${tag} ${item.question}</div>
+                        <div class="r-a">✓ ${item.options[item.correctIndex]}</div>
+                        <div class="r-e">💡 ${item.explanation}</div>
+                    `;
+                    rvList.appendChild(d);
+                });
+            } else {
+                rvSec.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
